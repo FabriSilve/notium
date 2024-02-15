@@ -15,3 +15,9 @@ https://www.tremor.so/docs/getting-started/installation
 
 Deploy on github
 https://medium.com/@badreddine.boudaoud21/create-a-react-app-with-vite-and-deploy-it-on-github-48b82e19f821
+
+Chrome Exstension to se formatted JSON in browser for tesing proxy lambda
+https://chromewebstore.google.com/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa
+
+Notion APIs documentation
+https://developers.notion.com/reference/post-database-query
