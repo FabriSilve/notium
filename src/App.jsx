@@ -11,6 +11,8 @@ import {
   Flex,
 } from '@tremor/react';
 
+import SettingsModal from './components/SettingsModal';
+
 /* const timeSpentOn = [
   { name: 'Features', value: 456 },
   { name: 'Bug fixes', value: 351 },
@@ -98,6 +100,7 @@ function App() {
         <header className="App-header">
           <h1>Notium</h1>
         </header>
+        <SettingsModal />
           <Flex className="w-11/12 h-11/12">
               <TabGroup>
                 <Flex className="w-full h-1/12">
