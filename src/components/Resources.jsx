@@ -210,8 +210,6 @@ const EpicStats = () => {
     setIsComputing(false);
   }, [rawTickets, useDemo, setData, setIsComputing]);
 
-  console.log('data', data);
-
   if (!hasData) return <p>no data</p>;
   if (isComputing) return <p>computing...</p>;
   return (
@@ -256,16 +254,13 @@ const EpicStats = () => {
                 className='h-100'
                 flexDirection='col'
                 justifyContent='between'
-                alignItems='between'
+                alignItems='end'
               >
-                <Flex>
-                  <Text>Last Updated: {epic.lastUpdated}</Text>
-                  <Text>Tot Tickets: {epic.ticketNumber}</Text>
-                </Flex>
-                <Flex flexDirection='col'>
-                  <Bold>Contributors:</Bold>
-                  {epic.conttributors.map((contributor) => <Text key={contributor}>{contributor}</Text>)}
-                </Flex>
+                  <Text><Bold>Last Updated:</Bold> {epic.lastUpdated}</Text>
+                  <Flex flexDirection='col' alignItems='end'>
+                    <Bold>Contributors:</Bold>
+                    {epic.conttributors.map((contributor) => <Text key={contributor}>{contributor}</Text>)}
+                  </Flex>
               </Flex>
             </Flex>
           </AccordionBody>
