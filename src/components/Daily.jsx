@@ -19,46 +19,11 @@ const mockTickets = [
   { title: 'AaUser I can use a button to refresh the credit data of an entity when I want', dependencies: [3], id: 4 },
 ]
 
-/*const demoChartdata = [
-  {
-    day: 'Tuesday',
-    Ideal: 16,
-    Actual: 16,
-  },
-  {
-    day: 'Wednesday',
-    Ideal: 24,
-    Actual: 22,
-  },
-  {
-    day: 'Thursday',
-    Ideal: 40,
-    Actual: 23,
-  },
-  {
-    day: 'Friday',
-    Ideal: 56,
-    Actual: 60,
-  },
+const demoChartdata = [
   {
     day: 'Monday',
-    Ideal: 72,
-    Actual: 72,
-  },
-  {
-    day: 'Tuesday',
-    Ideal: 88,
-    Actual: 87,
-  },
-  {
-    day: 'Wednesday',
-    Ideal: 104,
-    Actual: 102,
-  },
-  {
-    day: 'Thursday',
-    Ideal: 120,
-    Actual: 122,
+    Ideal: 152,
+    Actual: 152,
   },
   {
     day: 'Friday',
@@ -66,11 +31,46 @@ const mockTickets = [
     Actual: 137,
   },
   {
-    day: 'Monday',
-    Ideal: 152,
-    Actual: 152,
+    day: 'Thursday',
+    Ideal: 120,
+    Actual: 122,
   },
-]; */
+  {
+    day: 'Wednesday',
+    Ideal: 104,
+    Actual: 102,
+  },
+  {
+    day: 'Tuesday',
+    Ideal: 88,
+    Actual: 87,
+  },
+  {
+    day: 'Monday',
+    Ideal: 72,
+    Actual: 72,
+  },
+  {
+    day: 'Friday',
+    Ideal: 56,
+    Actual: 60,
+  },
+  {
+    day: 'Thursday',
+    Ideal: 40,
+    Actual: 23,
+  },
+  {
+    day: 'Wednesday',
+    Ideal: 24,
+    Actual: 22,
+  },
+  {
+    day: 'Tuesday',
+    Ideal: 16,
+    Actual: 16,
+  },
+];
 
 const valueFormatter = function (number) {
   return number + ' points ';
@@ -85,9 +85,11 @@ function formatDate(date) {
 }
 
 function BurndownChart() {
-  const { rawTickets } = useContext(Context);
+  const { rawTickets, useDemo } = useContext(Context);
 
   const doneTicketsByDate = useMemo(() => {
+    if (useDemo) return { pointsPerDay: demoChartdata, totalDonePoints: 152 };
+
     const doneTickets =  rawTickets.filter(rawTicket => rawTicket?.properties.Status.select.name === "Done #13");
     const totalDonePoints = doneTickets.reduce((totalSum, doneTicket) => totalSum + doneTicket?.properties["Complexity Points"].number, 0);
 
@@ -128,7 +130,7 @@ function BurndownChart() {
       }) 
     }
     return { pointsPerDay, totalDonePoints };
-  }, [rawTickets]);
+  }, [rawTickets, useDemo]);
 
   return (
     <>
