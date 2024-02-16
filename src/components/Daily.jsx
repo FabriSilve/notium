@@ -90,11 +90,11 @@ function BurndownChart() {
   const doneTicketsByDate = useMemo(() => {
     if (useDemo) return { pointsPerDay: demoChartdata, totalDonePoints: 152 };
 
-    const doneTickets =  rawTickets.filter(rawTicket => rawTicket?.properties.Status.select.name === "Done #13");
-    const totalDonePoints = doneTickets.reduce((totalSum, doneTicket) => totalSum + doneTicket?.properties["Complexity Points"].number, 0);
+    const doneTickets = rawTickets.filter(rawTicket => rawTicket?.properties.Status.select.name === "Done #13" || rawTicket?.properties.Status.select.name === "Done #49");
+    const totalDonePoints = doneTickets.reduce((totalSum, doneTicket) => totalSum + (doneTicket?.properties["Complexity Points"] || doneTicket.properties.Points).number, 0);
 
     const pointsPerDayRaw = doneTickets.reduce((acc, doneTicket) => {
-      const points = doneTicket?.properties["Complexity Points"].number || 0;
+      const points = (doneTicket?.properties["Complexity Points"] || doneTicket.properties.Points).number || 0;
       const date = doneTicket?.last_edited_time;
 
       if (date) {
@@ -154,7 +154,8 @@ const Ticket = ({ title, status }) => {
   if(status === "Doing") color = "orange";
   if(status === "Blocked") color = "red";
   if(status === "Review") color = "cyan";
-  if(status === "To Validate Developer") color = "yellow";
+  if (status === "To Validate Developer") color = "yellow";
+  if (status === "To Validate") color = "yellow";
 
   return (
     <Card className={`p-4 m-2 w-80 border-solid border-2 border-${color}-300`}>
@@ -173,6 +174,7 @@ function TicketSection() {
       || rawTicket?.properties.Status.select.name === "Blocked"
       || rawTicket?.properties.Status.select.name === "Review"
       || rawTicket?.properties.Status.select.name === "To Validate Developer"
+      || rawTicket?.properties.Status.select.name === "To Validate"
     );
 
     console.log('sprintTickets', sprintTickets.map((ticket) => ticket.properties.Name.title[0].plain_text));
