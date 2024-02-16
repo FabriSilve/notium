@@ -17,6 +17,7 @@ const URL = "https://bbmtaxqvndfucwmecqlmu5a6bm0axqes.lambda-url.eu-central-1.on
 function SettingModal() {
   const storedToken = Cookies.get('token');
   const storedDatabase = Cookies.get('database');
+  const storedStart = Cookies.get('start');
 
   const {
     setTickets,
@@ -30,20 +31,22 @@ function SettingModal() {
 
   const [token, setToken] = useState(storedToken || '');
   const [database, setDatabase] = useState(storedDatabase || '');
+  const [start, setStart] = useState(storedStart || '');
 
   const saveSettings = useCallback(async (event) => {
     event.preventDefault();
     setIsLoading(true);
     Cookies.set('token', token, { expires: 30 });
     Cookies.set('database', database, { expires: 30 });
+    Cookies.set('start', start, { expires: 30 });
 
-    const credentialsParams = `notion_key=${token}&database_id=${database}`;
-    let data = await fetch(`${URL}?page_size=100&${credentialsParams}`);
+    const baseParams = `notion_key=${token}&database_id=${database}${start ? `&last_edited_time=${start}` : ''}`;
+    let data = await fetch(`${URL}?page_size=100&${baseParams}`);
     let result = await data.json();
     let tickets = result.pages.results;
     let nextCursor = result.pages.next_cursor
     while (nextCursor) {
-      data = await fetch(`${URL}?page_size=100&cursor=${nextCursor}&${credentialsParams}`);
+      data = await fetch(`${URL}?page_size=100&cursor=${nextCursor}&${baseParams}`);
       result = await data.json();
       tickets = tickets.concat(result.pages.results);
       nextCursor = result.pages.next_cursor
@@ -55,6 +58,7 @@ function SettingModal() {
     setIsOpen(false)
     setIsLoading(false);
   }, [
+    start,
     token,
     database,
     setTickets,
@@ -101,6 +105,12 @@ function SettingModal() {
             type="password"
             value={database}
             onChange={(event) => setDatabase(event.target.value)}
+          />
+          <TextInput
+            className="mt-6"
+            placeholder="Start Date (YYYY-MM-DD)"
+            value={start}
+            onChange={(event) => setStart(event.target.value)}
           />
           <Button
             className="mt-8 w-full"
