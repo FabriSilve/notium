@@ -22,6 +22,7 @@ function SettingModal() {
     setTickets,
     hasData,
     setHasData,
+    setUseDemo,
   } = useContext(Context);
 
   const [isOpen, setIsOpen] = useState(!hasData);
@@ -59,6 +60,19 @@ function SettingModal() {
     setHasData,
   ]);
 
+  const seeDemo = useCallback(async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setHasData(true);
+    setUseDemo(true);
+
+    setIsOpen(false)
+    setIsLoading(false);
+  }, [
+    setHasData,
+    setUseDemo,
+  ]);
+
   return (
     <>
       <Button className="mx-auto block" onClick={() => setIsOpen(true)}>Settings</Button>
@@ -88,6 +102,13 @@ function SettingModal() {
             disabled={isLoading}
           >
             Fetch Data
+          </Button>
+          <Button
+            className="mt-8 w-full"
+            onClick={seeDemo}
+            disabled={isLoading}
+          >
+           See Demo
           </Button>
         </DialogPanel>
       </Dialog>

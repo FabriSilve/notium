@@ -6,12 +6,15 @@ export const Context = createContext("");
 const ContextProvider = ({ children }) => {
   const [rawTickets, setTickets] = useState([]);
   const [hasData, setHasData] = useState(false);
+  const [useDemo, setUseDemo] = useState(false);
 
   const context = {
     rawTickets,
     setTickets,
     hasData,
     setHasData,
+    useDemo,
+    setUseDemo,
   }
 
   return (
