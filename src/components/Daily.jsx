@@ -1,32 +1,25 @@
+/* eslint-disable react/prop-types */
 import {
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanels,
   TabPanel,
   LineChart,
   Card,
-  BarList,
   Flex,
   AccordionList,
+  Legend,
 } from '@tremor/react';
 
 import { TicketCard } from './TicketCard';
-
-const timeSpentOn = [
-  { name: 'Features', value: 456 },
-  { name: 'Bug fixes', value: 351 },
-  { name: 'Unplanned', value: 51 },
-];
+import { useContext, useMemo } from 'react';
+import { Context } from '../logic/Context';
 
 const mockTickets = [
-  { title: 'AaUser I can see this in Notium', dependencies: [2], id: 1 },
-  { title: 'AaUser I can see dependencies', dependencies: [], id: 2 },
-  { title: 'AaUser I can see dependencies2', dependencies: [2, 4, 1], id: 3 },
-  { title: 'AaUser I can see dependencies3', dependencies: [3], id: 4 },
+  { title: 'AaDev I see a new collection where the credentials are saved for each provider for each client', dependencies: [], id: 1 },
+  { title: 'AaDev I can see a new api client for CreditSafe', dependencies: [1, 3], id: 2 },
+  { title: 'AaDev I see a new collection where the creditSafe data is stored', dependencies: [2], id: 3 },
+  { title: 'AaUser I can use a button to refresh the credit data of an entity when I want', dependencies: [3], id: 4 },
 ]
 
-const chartdata = [
+/*const demoChartdata = [
   {
     day: 'Tuesday',
     Ideal: 16,
@@ -77,26 +70,120 @@ const chartdata = [
     Ideal: 152,
     Actual: 152,
   },
-];
+]; */
 
 const valueFormatter = function (number) {
   return number + ' points ';
 };
 
-export function BurndownChart() {
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+function BurndownChart() {
+  const { rawTickets } = useContext(Context);
+
+  const doneTicketsByDate = useMemo(() => {
+    const doneTickets =  rawTickets.filter(rawTicket => rawTicket?.properties.Status.select.name === "Done #13");
+    const totalDonePoints = doneTickets.reduce((totalSum, doneTicket) => totalSum + doneTicket?.properties["Complexity Points"].number, 0);
+
+    const pointsPerDayRaw = doneTickets.reduce((acc, doneTicket) => {
+      const points = doneTicket?.properties["Complexity Points"].number || 0;
+      const date = doneTicket?.last_edited_time;
+
+      if (date) {
+        const dateString = formatDate(new Date(date));
+
+        if (acc[dateString]) acc[dateString] += points;
+        else acc[dateString] = points;
+      }
+      return acc;
+    }, {});
+
+    const pointsPerDayArray = Object.keys(pointsPerDayRaw).map((key) => ({
+      day: key,
+      points: pointsPerDayRaw[key],
+    })).sort((a, b) => {
+      if (a.day < b.day) return -1;
+      if (a.day > b.day) return 1;
+      return 0;
+  });
+    
+    const totalPoints = 96;
+    const LENGTH_OF_SPRINT = 10;
+    const pointsPerDay = [];
+
+    let totalPointsDone = 0; 
+  
+    for (let i = 0; i < pointsPerDayArray.length; i += 1) {
+      totalPointsDone += pointsPerDayArray[i].points;
+      pointsPerDay.push({
+        day: pointsPerDayArray[i].day,
+        Ideal: totalPoints - (totalPoints/LENGTH_OF_SPRINT * i),
+        Actual: totalPoints - totalPointsDone,
+      }) 
+    }
+    return { pointsPerDay, totalDonePoints };
+  }, [rawTickets]);
+
   return (
     <>
       <LineChart
         className="mt-6 h-60"
-        data={chartdata}
+        data={doneTicketsByDate.pointsPerDay}
         index="day"
         yAxisWidth={65}
         categories={['Ideal', 'Actual']}
-        colors={['red', 'cyan']}
+        colors={['red', 'blue']}
         valueFormatter={valueFormatter}
       />
     </>
   );
+}
+
+const Ticket = ({ title, status }) => {
+  let color = "black";
+
+  if(status === "Sprint Backlog") color = "violet";
+  if(status === "Doing") color = "orange";
+  if(status === "Blocked") color = "red";
+  if(status === "Review") color = "cyan";
+  if(status === "To Validate Developer") color = "yellow";
+
+  return (
+    <Card className={`p-4 m-2 w-80 border-solid border-2 border-${color}-300`}>
+      <h3>{title}</h3>
+    </Card>
+  );
+};
+
+function TicketSection() {
+  const { rawTickets } = useContext(Context);
+
+  const allTickets = useMemo(() => {
+    const sprintTickets =  rawTickets.filter(rawTicket => 
+      rawTicket?.properties.Status.select.name === "Sprint Backlog"
+      || rawTicket?.properties.Status.select.name === "Doing"
+      || rawTicket?.properties.Status.select.name === "Blocked"
+      || rawTicket?.properties.Status.select.name === "Review"
+      || rawTicket?.properties.Status.select.name === "To Validate Developer"
+    );
+
+    console.log('sprintTickets', sprintTickets.map((ticket) => ticket.properties.Name.title[0].plain_text));
+    return sprintTickets;
+  }, [rawTickets]);
+
+  return (
+    <Flex className="flex-wrap" >
+      {allTickets.map((ticket, index) => (
+        <Ticket key={index} title={ticket.properties.Name.title[0].plain_text} status={ticket.properties.Status.select.name}/>
+      ))}
+    </Flex>
+  )
 }
 
 const Daily = () => {
@@ -109,19 +196,15 @@ const Daily = () => {
         <Card style={{ marginBottom: '30px' }}>
           <BurndownChart />
         </Card>
-        <Card>
-          <h3 className="text-lg font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Dependency tickets</h3>
-          <AccordionList>{mockTickets.map((ticket) => <TicketCard key={ticket.id} ticket={ticket} allTickets={mockTickets} />)}</AccordionList>
-          {/* {mockTickets.map((ticket) => )} */}
+        <Card style={{ marginBottom: '30px' }}>
+          <h3 className="text-lg font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Tickets</h3>
+          <Legend style={{ marginBottom: '30px' }} categories={["Sprint Backlog", "Doing", "Blocked", "Review", "To Validate Developer"]} colors={["violet", "orange", "red", "cyan", "yellow"]}/>
+          <TicketSection/>
         </Card>
-      </Flex>
-      <Flex
-        className="w-full"
-        flexDirection="col"
-      >
-        <Card>
-          <h3 className="text-lg font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Time spent on</h3>
-          <BarList data={timeSpentOn} className="mx-auto max-w-sm" />
+        <Card style={{ marginBottom: '30px' }}>
+          <h3 className="m-3 text-lg font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Dependency tickets</h3>
+          <AccordionList >{mockTickets.map((ticket) => <TicketCard key={ticket.id} ticket={ticket} allTickets={mockTickets} />)}</AccordionList>
+          {/* {mockTickets.map((ticket) => )} */}
         </Card>
       </Flex>
     </TabPanel>
