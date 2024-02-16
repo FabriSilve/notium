@@ -91,7 +91,7 @@ const Epics = () => {
       const doneTickets = rawTickets.filter(ticket => /^Done/.test(ticket.properties.Status.select.name));
       const epicData = doneTickets.reduce((acc, ticket) => {
         const epic = ticket.properties.EpicName.formula.string || 'KBAR';
-        const points = ticket.properties.Points.number || 0;
+        const points = (ticket.properties.Points || ticket.properties['Complexity Points']).number || 0;
 
         if (!acc[epic]) acc[epic] = points;
         else acc[epic] += points;
@@ -174,7 +174,7 @@ const EpicStats = () => {
 
       const epicData = doneTickets.reduce((acc, ticket) => {
         const epic = ticket.properties.EpicName.formula.string || 'KBAR';
-        const points = ticket.properties.Points.number || 0;
+        const points = (ticket.properties.Points || ticket.properties['Complexity Points']) || 0;
         const lastUpdated = ticket.last_edited_time.slice(0, 10);
         const isInvestigation = /^\[/.test(ticket.properties.Name.title[0].plain_text);
         const conttributors = (ticket.properties.Assign.people || []).map(person => person.name);
