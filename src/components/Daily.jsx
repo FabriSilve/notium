@@ -12,12 +12,99 @@ import { TicketCard } from './TicketCard';
 import { useContext, useMemo } from 'react';
 import { Context } from '../logic/Context';
 
-const mockTickets = [
+const demoDepedencyTickets = [
   { title: 'AaDev I see a new collection where the credentials are saved for each provider for each client', dependencies: [], id: 1 },
   { title: 'AaDev I can see a new api client for CreditSafe', dependencies: [1, 3], id: 2 },
   { title: 'AaDev I see a new collection where the creditSafe data is stored', dependencies: [2], id: 3 },
   { title: 'AaUser I can use a button to refresh the credit data of an entity when I want', dependencies: [3], id: 4 },
 ]
+
+const demoTickets = [
+  {
+    properties: {
+      Name: {
+        title: [{
+          plain_text: 'AaUser I can see demo data'
+        }],
+      },
+      Status: {
+        select: {
+          name: 'Doing',
+        }
+      }
+    },
+  },
+  {
+    properties: {
+      Name: {
+        title: [{
+          plain_text: 'AaUser I can see a blocked ticket'
+        }],
+      },
+      Status: {
+        select: {
+          name: 'Blocked',
+        }
+      }
+    },
+  },
+  {
+    properties: {
+      Name: {
+        title: [{
+          plain_text: '[Timebox 4h] AaDev I know how to use tremor components'
+        }],
+      },
+      Status: {
+        select: {
+          name: 'Sprint Backlog',
+        }
+      }
+    },
+  },
+  {
+    properties: {
+      Name: {
+        title: [{
+          plain_text: 'AaUser I find this demo very useful and think it has pretty colours'
+        }],
+      },
+      Status: {
+        select: {
+          name: 'To Validate Developer',
+        }
+      }
+    },
+  },
+  {
+    properties: {
+      Name: {
+        title: [{
+          plain_text: 'AaDev I know this ticket section is displaying demo tickets'
+        }],
+      },
+      Status: {
+        select: {
+          name: 'Review',
+        }
+      }
+    },
+  },
+  {
+    properties: {
+      Name: {
+        title: [{
+          plain_text: 'AaDev I know this ticket is displayed here'
+        }],
+      },
+      Status: {
+        select: {
+          name: 'Review',
+        }
+      }
+    },
+  },
+];
 
 const demoChartdata = [
   {
@@ -164,9 +251,11 @@ const Ticket = ({ title, status }) => {
 };
 
 function TicketSection() {
-  const { rawTickets } = useContext(Context);
+  const { rawTickets, useDemo } = useContext(Context);
 
   const allTickets = useMemo(() => {
+    if(useDemo) return demoTickets;
+  
     const sprintTickets =  rawTickets.filter(rawTicket => 
       rawTicket?.properties.Status.select.name === "Sprint Backlog"
       || rawTicket?.properties.Status.select.name === "Doing"
@@ -175,9 +264,8 @@ function TicketSection() {
       || rawTicket?.properties.Status.select.name === "To Validate Developer"
     );
 
-    console.log('sprintTickets', sprintTickets.map((ticket) => ticket.properties.Name.title[0].plain_text));
     return sprintTickets;
-  }, [rawTickets]);
+  }, [rawTickets, useDemo]);
 
   return (
     <Flex className="flex-wrap" >
@@ -205,8 +293,8 @@ const Daily = () => {
         </Card>
         <Card style={{ marginBottom: '30px' }}>
           <h3 className="m-3 text-lg font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Dependency tickets</h3>
-          <AccordionList >{mockTickets.map((ticket) => <TicketCard key={ticket.id} ticket={ticket} allTickets={mockTickets} />)}</AccordionList>
-          {/* {mockTickets.map((ticket) => )} */}
+          <AccordionList >{demoDepedencyTickets.map((ticket) => <TicketCard key={ticket.id} ticket={ticket} allTickets={demoDepedencyTickets} />)}</AccordionList>
+          {/* {demoDepedencyTickets.map((ticket) => )} */}
         </Card>
       </Flex>
     </TabPanel>
