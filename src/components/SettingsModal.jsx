@@ -37,12 +37,13 @@ function SettingModal() {
     Cookies.set('token', token, { expires: 30 });
     Cookies.set('database', database, { expires: 30 });
 
-    let data = await fetch(`${URL}?page_size=100`);
+    const credentialsParams = `notion_key=${token}&database_id=${database}`;
+    let data = await fetch(`${URL}?page_size=100&${credentialsParams}`);
     let result = await data.json();
     let tickets = result.pages.results;
     let nextCursor = result.pages.next_cursor
     while (nextCursor) {
-      data = await fetch(`${URL}?page_size=100&cursor=${nextCursor}`);
+      data = await fetch(`${URL}?page_size=100&cursor=${nextCursor}&${credentialsParams}`);
       result = await data.json();
       tickets = tickets.concat(result.pages.results);
       nextCursor = result.pages.next_cursor
