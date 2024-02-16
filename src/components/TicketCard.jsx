@@ -37,7 +37,7 @@ export const TicketCard = ({ticket, allTickets}) => {
             key={`inner-${tick.id}`} 
             id={`inner-${tick.id}`} 
             relations={undefined}>
-             <div className="border-2 border-black p-2 w-fit">{tick.title}</div>
+             <div className="border-2 border-black-500 p-2 w-fit">{tick.title}</div>
             </ArcherElement>
         ))
       }
@@ -69,7 +69,7 @@ export const TicketCard = ({ticket, allTickets}) => {
                     id="root"
                     relations={getRelations()}
                 >
-                    <div className=" border-2 border-green-500 p-2 w-fit">{ticket.title}</div>
+                    <div className=" border-2 border-black p-2 w-fit">{ticket.title}</div>
                 </ArcherElement>
           
             <div className="flex gap-2 mt-10">
