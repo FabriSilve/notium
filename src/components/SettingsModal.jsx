@@ -76,7 +76,12 @@ function SettingModal() {
 
   return (
     <>
-      <Button className="mx-auto block" onClick={() => setIsOpen(true)}>Settings</Button>
+      <Button
+        className="mx-auto block fixed top-4 right-20 z-20"
+        onClick={() => setIsOpen(true)}
+      >
+        Settings
+      </Button>
       <Dialog open={isOpen} onClose={(val) => !isLoading & hasData ? setIsOpen(val) : null} static={true}>
         <DialogPanel>
           <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Settings</h3>
