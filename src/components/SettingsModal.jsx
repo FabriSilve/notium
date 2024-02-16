@@ -36,6 +36,7 @@ function SettingModal() {
   const saveSettings = useCallback(async (event) => {
     event.preventDefault();
     setIsLoading(true);
+    setUseDemo(false);
     Cookies.set('token', token, { expires: 30 });
     Cookies.set('database', database, { expires: 30 });
     Cookies.set('start', start, { expires: 30 });
@@ -54,7 +55,6 @@ function SettingModal() {
 
     setTickets(tickets);
     setHasData(true);
-
     setIsOpen(false)
     setIsLoading(false);
   }, [
@@ -63,6 +63,7 @@ function SettingModal() {
     database,
     setTickets,
     setHasData,
+    setUseDemo,
   ]);
 
   const seeDemo = useCallback(async (event) => {
